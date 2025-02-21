@@ -1,4 +1,9 @@
-use std::{collections::HashMap, env, net::SocketAddr, str::FromStr};
+use std::{
+    collections::{BTreeMap, HashMap},
+    env,
+    net::SocketAddr,
+    str::FromStr,
+};
 
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -73,22 +78,17 @@ fn get_reactions(
         .map(|r| r.unwrap())
         .collect::<Vec<_>>();
 
-    let mut response: HashMap<String, (i32, bool)> = HashMap::new();
+    let mut response: BTreeMap<String, (i32, bool)> = BTreeMap::new();
     for emoji in emojis.chars() {
-        response.insert(emoji.to_string(), (0, false));
+        if is_emoji(emoji) {
+            response.insert(emoji.to_string(), (0, false));
+        }
     }
 
     for reaction in &reactions {
         if let Some(target) = response.get_mut(&reaction.target) {
             target.0 = reaction.reactions;
             target.1 = reaction.reacted;
-        }
-    }
-
-    for emoji in emojis.chars() {
-        let emoji = emoji.to_string();
-        if !response.contains_key(&emoji) {
-            response.insert(emoji, (0, false));
         }
     }
 
