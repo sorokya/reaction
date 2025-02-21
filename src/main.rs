@@ -2,14 +2,14 @@ use std::{collections::HashMap, env, net::SocketAddr, str::FromStr};
 
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
-use rusqlite::{OptionalExtension, params};
+use rusqlite::{params, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use unic_emoji_char::is_emoji;
 use warp::{
-    Filter,
     http::StatusCode,
     reply::{Reply, Response},
+    Filter,
 };
 
 #[derive(Deserialize)]
@@ -154,7 +154,7 @@ async fn main() {
 
     let host = match env::var("REACTION_HOST") {
         Ok(host) => host,
-        Err(_) => "127.0.0.1".to_string(),
+        Err(_) => "0.0.0.0".to_string(),
     };
 
     let port = match env::var("REACTION_PORT") {
@@ -164,7 +164,7 @@ async fn main() {
                 panic!("Invalid port: {}", e);
             }
         },
-        Err(_) => 3030,
+        Err(_) => 8080,
     };
 
     let manager = SqliteConnectionManager::file(db_path);
