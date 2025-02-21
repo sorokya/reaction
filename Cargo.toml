@@ -1,7 +1,10 @@
 [package]
 name = "reaction"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
+repository = "https://github.com/sorokya/reaction"
+description = "A Simple Emoji Reaction API"
+authors = ["Richard Leek <richard@richardleek.com>"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
@@ -13,3 +16,8 @@ r2d2_sqlite = "0.26"
 rusqlite = { version = "0.33", features = ["bundled"] }
 unic-emoji-char = "0.9"
 sha2 = "0.10"
+
+# The profile that 'cargo dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
