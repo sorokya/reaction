@@ -80,4 +80,4 @@ This will:
 
 ## 📄 License
 
-This project is licensed under the MIT License. See [LICENSE](https://github.com/sorokya/reaction/blob/master/LICENSE) for details.
+This project is licensed under the MIT License. See [LICENSE](https://github.com/sorokya/reaction/blob/master/LICENSE.txt) for details.
