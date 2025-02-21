@@ -6,6 +6,9 @@ repository = "https://github.com/sorokya/reaction"
 description = "A Simple Emoji Reaction API"
 authors = ["Richard Leek <richard@richardleek.com>"]
 
+[target.'cfg(target_env = "musl")'.dependencies]
+mimalloc = "0.1.43"
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 warp = "0.3"
