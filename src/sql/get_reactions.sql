@@ -1,4 +1,4 @@
-SELECT emoji, COUNT(1), CASE uid WHEN ?2 THEN true ELSE false END
+SELECT emoji, COUNT(1), MAX(uid = ?2)
 FROM Reactions
 WHERE slug = ?1
 GROUP BY emoji

@@ -858,7 +858,7 @@ dependencies = [
 
 [[package]]
 name = "reaction"
-version = "1.3.0"
+version = "1.3.2"
 dependencies = [
  "mimalloc",
  "r2d2",
