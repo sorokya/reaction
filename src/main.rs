@@ -36,6 +36,22 @@ struct Reaction {
     reacted: bool,
 }
 
+fn get_real_ip(headers: warp::http::HeaderMap, addr: Option<std::net::SocketAddr>) -> String {
+    if let Some(forwarded) = headers.get("x-forwarded-for") {
+        if let Ok(forwarded_str) = forwarded.to_str() {
+            return forwarded_str
+                .split(',')
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_string();
+        }
+    }
+    // Fallback to remote address
+    addr.map(|a| a.ip().to_string())
+        .unwrap_or_else(|| "unknown".to_string())
+}
+
 fn hash_ip(ip: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(ip.as_bytes());
@@ -45,7 +61,7 @@ fn hash_ip(ip: &str) -> String {
 fn get_reactions(
     p: HashMap<String, String>,
     emojis: &str,
-    remote_addr: &Option<std::net::SocketAddr>,
+    uid: &str,
     pool: &Pool<SqliteConnectionManager>,
 ) -> Result<Response, Box<dyn std::error::Error>> {
     let slug = match p.get("slug") {
@@ -53,16 +69,6 @@ fn get_reactions(
         None => {
             return Ok(
                 warp::reply::with_status("Missing param: slug", StatusCode::BAD_REQUEST)
-                    .into_response(),
-            );
-        }
-    };
-
-    let uid = match remote_addr {
-        Some(ip) => hash_ip(&ip.ip().to_string()),
-        None => {
-            return Ok(
-                warp::reply::with_status("Could not get IP", StatusCode::BAD_REQUEST)
                     .into_response(),
             );
         }
@@ -103,7 +109,7 @@ fn get_reactions(
 
 fn post_reaction(
     reaction: &PostData,
-    remote_addr: &Option<std::net::SocketAddr>,
+    uid: &str,
     pool: &Pool<SqliteConnectionManager>,
 ) -> Result<Response, Box<dyn std::error::Error>> {
     if reaction.slug.trim() == "" {
@@ -127,15 +133,6 @@ fn post_reaction(
     }
 
     let db = pool.get()?;
-    let uid = match remote_addr {
-        Some(ip) => hash_ip(&ip.ip().to_string()),
-        None => {
-            return Ok(
-                warp::reply::with_status("Could not get IP", StatusCode::BAD_REQUEST)
-                    .into_response(),
-            );
-        }
-    };
 
     let mut stmt = db.prepare(include_str!("./sql/get_reaction_for_target.sql"))?;
 
@@ -213,15 +210,17 @@ async fn main() {
     let get_pool = pool.clone();
     let get = warp::get()
         .and(warp::query::<HashMap<String, String>>())
+        .and(warp::header::headers_cloned())
         .and(warp::addr::remote())
         .and(warp::any().map(move || get_pool.clone()))
         .map(
             move |p: HashMap<String, String>,
+                  headers: warp::http::HeaderMap,
                   remote_addr: Option<std::net::SocketAddr>,
                   pool: Pool<SqliteConnectionManager>| match get_reactions(
                 p,
                 &emojis,
-                &remote_addr,
+                &hash_ip(&get_real_ip(headers, remote_addr)),
                 &pool,
             ) {
                 Ok(reply) => reply,
@@ -236,14 +235,16 @@ async fn main() {
     let post = warp::post()
         .and(warp::body::content_length_limit(1024))
         .and(warp::body::json())
+        .and(warp::header::headers_cloned())
         .and(warp::addr::remote())
         .and(warp::any().map(move || pool.clone()))
         .map(
             |reaction: PostData,
+             headers: warp::http::HeaderMap,
              remote_addr: Option<std::net::SocketAddr>,
              pool: Pool<SqliteConnectionManager>| match post_reaction(
                 &reaction,
-                &remote_addr,
+                &hash_ip(&get_real_ip(headers, remote_addr)),
                 &pool,
             ) {
                 Ok(response) => response,
