@@ -6,6 +6,8 @@ A lightweight and fast emoji reaction API built with Rust and powered by [Warp](
 
 Designed to integrate seamlessly with the serene theme for [Zola](https://www.getzola.org/).
 
+---
+
 
 ## 🛠️ How to Build
 
@@ -20,6 +22,8 @@ cargo build --release
 ```
 
 This will compile the project in release mode for better performance.
+
+---
 
 ## 🚀 How to Run
 
@@ -46,6 +50,8 @@ Download the [latest release](https://github.com/sorokya/reaction/releases/lates
 ./reaction
 ```
 
+---
+
 ## 🐳 Running with Docker
 
 A prebuilt Docker image is available at:
@@ -61,12 +67,16 @@ This will:
 - Expose the API on port 8080
 - Mount your reactions.db file for persistent storage
 
+---
+
 ## 📜 API Endpoints
 
 | **Method** | **Endpoint** | **Description**                  |
 |------------|--------------|----------------------------------|
 | `GET`      | /            | Fetch reactions for a given slug |
 | `POST`     | /            | Add a reaction to a slug         |
+
+---
 
 ## 📄 License
 
