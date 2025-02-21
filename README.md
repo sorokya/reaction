@@ -4,7 +4,7 @@
 
 A lightweight and fast emoji reaction API built with Rust and powered by [Warp](https://crates.io/crates/warp).
 
-Designed to integrate seamlessly with the serene theme for [Zola](https://www.getzola.org/).
+Designed to integrate seamlessly with the [serene](https://github.com/isunjn/serene) theme for [Zola](https://www.getzola.org/).
 
 ---
 
