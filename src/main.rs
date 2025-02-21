@@ -85,10 +85,7 @@ fn get_reactions(
         })
     })?;
 
-    let reactions: Vec<Reaction> = reactions
-        .filter(|r| r.is_ok())
-        .map(|r| r.unwrap())
-        .collect::<Vec<_>>();
+    let reactions: Vec<Reaction> = reactions.flatten().collect::<Vec<_>>();
 
     let mut response: BTreeMap<String, (i32, bool)> = BTreeMap::new();
     for emoji in emojis.chars() {
