@@ -60,7 +60,7 @@ A prebuilt Docker image is available at:
 ### Run with Docker
 
 ```sh
-docker run -p 8080:8080 -v $(pwd)/reactions.db:/reaction/reactions.db ghcr.io/sorokya/reaction
+docker run -p 8080:8080 -v $(pwd)/reactions.db:/reaction/reactions.db ghcr.io/sorokya/reaction:master
 ```
 
 This will:
