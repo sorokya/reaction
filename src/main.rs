@@ -33,6 +33,7 @@ fn hash_ip(ip: &str) -> String {
 
 fn get_reactions(
     p: HashMap<String, String>,
+    emojis: &str,
     remote_addr: &Option<std::net::SocketAddr>,
     pool: &Pool<SqliteConnectionManager>,
 ) -> Result<Response, Box<dyn std::error::Error>> {
@@ -73,12 +74,22 @@ fn get_reactions(
         .collect::<Vec<_>>();
 
     let mut response: HashMap<String, (i32, bool)> = HashMap::new();
+    for emoji in emojis.chars() {
+        response.insert(emoji.to_string(), (0, false));
+    }
 
     for reaction in &reactions {
-        response.insert(
-            reaction.target.to_string(),
-            (reaction.reactions, reaction.reacted),
-        );
+        if let Some(target) = response.get_mut(&reaction.target) {
+            target.0 = reaction.reactions;
+            target.1 = reaction.reacted;
+        }
+    }
+
+    for emoji in emojis.chars() {
+        let emoji = emoji.to_string();
+        if !response.contains_key(&emoji) {
+            response.insert(emoji, (0, false));
+        }
     }
 
     Ok(warp::reply::json(&response).into_response())
@@ -157,6 +168,11 @@ async fn main() {
         Err(_) => "0.0.0.0".to_string(),
     };
 
+    let emojis = match env::var("REACTION_EMOJIS") {
+        Ok(emojis) => emojis,
+        Err(_) => "👍❤️🔥👏🤩😂😢🤔😡🤯🧠🎉⚡💤🤝".to_string(),
+    };
+
     let port = match env::var("REACTION_PORT") {
         Ok(port) => match port.parse::<i32>() {
             Ok(port) => port,
@@ -198,6 +214,7 @@ async fn main() {
                   remote_addr: Option<std::net::SocketAddr>,
                   pool: Pool<SqliteConnectionManager>| match get_reactions(
                 p,
+                &emojis,
                 &remote_addr,
                 &pool,
             ) {

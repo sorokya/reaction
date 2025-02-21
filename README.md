@@ -29,11 +29,12 @@ This will compile the project in release mode for better performance.
 
 Reaction API can be configured using the following environment variables:
 
-| **Variable**    | **Description**               | **Default Value** |
-|-----------------|-------------------------------|-------------------|
-| `REACTION_DB`   | Path to the SQLite database   | `./reactions.db`  |
-| `REACTION_HOST` | Host the API should listen on | `0.0.0.0`         |
-| `REACTION_PORT` | Port the API should listen on | `8080`            |
+| **Variable**      | **Description**               | **Default Value**               |
+|-------------------|-------------------------------|---------------------------------|
+| `REACTION_DB`     | Path to the SQLite database   | `./reactions.db`                |
+| `REACTION_HOST`   | Host the API should listen on | `0.0.0.0`                       |
+| `REACTION_PORT`   | Port the API should listen on | `8080`                          |
+| `REACTION_EMOJIS` | Emojis to pick from           | `👍❤️🔥👏🤩😂😢🤔😡🤯🧠🎉⚡💤🤝` |
 
 The API will automatically create a SQLite database if one doesn't exist.
 
